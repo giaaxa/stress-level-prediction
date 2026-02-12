@@ -1,72 +1,233 @@
-# ![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+#  Human Stress Detection from Sleep & Lifestyle (Streamlit)
 
-## Template Instructions
+StressSense is a Streamlit data app that explores how everyday habits (sleep, screen time, activity, work, caffeine, etc.) relate to self-reported stress level (**Low / Medium / High**).
 
-Welcome,
+This project is built for learning and wellbeing insight. It is **not** a medical tool and does not diagnose or treat any condition.
 
-This is the Code Institute student template for the Data Analytics capstone project. We have preinstalled all of the tools you need to get started. It's perfectly okay to use this template as the basis for your project submissions. Click the `Use this template` button above to get started.
+## CI Logo
 
-You can safely delete the Template Instructions section of this README.md file and modify the remaining paragraphs for your own project. Please do read the Template Instructions at least once, though! It contains some important information about the IDE and the extensions we use.
+![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+---
 
-## How to use this repo
+## Dataset
 
-1. Use this template to create your GitHub project repo. Click the **Use this template** button, then click **Create a new repository**.
+**Source:** Kaggle — “Stress Level Prediction” (shijo96john)  
+**Rows / Columns:** 773 rows × 22 columns  
+**Target:** `Stress_Detection` (Low / Medium / High)
 
-1. Copy the URL of your repository to your clipboard.
+### Target breakdown
+- Medium: 310  
+- High: 301  
+- Low: 162  
 
-1. In VS Code, select **File** -> **Open Folder**.
+### What’s in the data (high level)
+- **Demographics:** Age, Gender, Marital_Status, Occupation  
+- **Sleep:** Sleep_Duration, Sleep_Quality, Bed_Time, Wake_Up_Time  
+- **Lifestyle:** Physical_Activity, Screen_Time, Caffeine_Intake, Alcohol_Intake, Smoking_Habit, Work_Hours, Travel_Time, Social_Interactions, Meditation_Practice, Exercise_Type  
+- **Health indicators:** Blood_Pressure, Cholesterol_Level, Blood_Sugar_Level  
 
-1. Select your `vscode-projects` folder, then click the **Select Folder** button on Windows, or the **Open** button on Mac.
+### Notes on data cleaning
+- `Bed_Time` and `Wake_Up_Time` are strings (e.g., “10:00 PM”). In ETL they’re parsed into a usable numeric form (minutes since midnight).
+- No missing values or exact duplicates were found in the raw file, but ETL still enforces types and validates the dataset before analysis.
 
-1. From the top menu in VS Code, select **Terminal** > **New Terminal** to open the terminal.
+---
 
-1. In the terminal, type `git clone` followed by the URL of your GitHub repository. Then hit **Enter**. This command will download all the files in your GitHub repository into your vscode-projects folder.
+## Why this project exists (business rationale)
 
-1. In VS Code, select **File** > **Open Folder** again.
+Stress is influenced by routines — sleep quality, screen habits, activity levels, work hours, commuting, and lifestyle choices. Most people know stress is a problem, but it’s not obvious which habits are most linked to it in practice.
 
-1. This time, navigate to and select the folder for the project you just downloaded. Then, click **Select Folder**.
+StressSense makes those patterns visible, tests a few sensible assumptions with statistics, and demonstrates how a simple predictive feature could work in a wellbeing app.
 
-1. A virtual environment is necessary when working with Python projects to ensure each project's dependencies are kept separate from each other. You need to create your virtual environment, also called a venv, and then ensure that it is activated any time you return to your workspace.
-Click the gear icon in the lower left-hand corner of the screen to open the Manage menu and select **Command Palette** to open the VS Code command palette.
+**Target audience**
+- Individuals exploring wellbeing patterns (non-clinical)
+- Wellness / lifestyle app users
+- Workplace wellbeing stakeholders (high-level, non-clinical)
 
-1. In the command palette, type: *create environment* and select **Python: Create Environment…**
+---
 
-1. Choose **Venv** from the dropdown list.
+## Business requirements (what the Streamlit app must answer)
 
-1. Choose the Python version you installed earlier. Currently, we recommend Python 3.12.8
+1. **Stress overview**
+   - How many users fall into Low / Medium / High?
+   - What are the baseline averages for sleep, screen time, work hours, etc.?
 
-1. **DO NOT** click the box next to `requirements.txt`, as you need to do more steps before you can install your dependencies. Click **OK**.
+2. **Key drivers**
+   - Which features show the strongest relationship with stress in this dataset?
 
-1. You will see a `.venv` folder appear in the file explorer pane to show that the virtual environment has been created.
+3. **Segment comparisons**
+   - How does stress differ for meditation vs non-meditation, exercise types, gender, etc.?
 
-1. **Important**: Note that the `.venv` folder is in the `.gitignore` file so that Git won't track it.
+4. **Evidence (not just vibes)**
+   - Show simple statistical tests + effect sizes where appropriate.
 
-1. Return to the terminal by clicking on the TERMINAL tab, or click on the **Terminal** menu and choose **New Terminal** if no terminal is currently open.
+5. **Predictive prototype**
+   - Input habits → get predicted stress category + probabilities.
 
-1. In the terminal, use the command below to install your dependencies. This may take several minutes.
+6. **Clear takeaways**
+   - 2–3 plain-English insights a normal human can understand.
 
- ```console
- pip3 install -r requirements.txt
- ```
+---
 
-1. Open the `jupyter_notebooks` directory, and click on the notebook you want to open.
+## Hypotheses tested (and how I test them)
 
-1. Click the **kernel** button and choose **Python Environments**.
+I’m not trying to “prove causation”. These are associations in this dataset.
 
-Note that the kernel says `Python 3.12.8` as it inherits from the venv, so it will be Python-3.12.8 if that is what is installed on your PC. To confirm this, you can use the command below in a notebook code cell.
+**H1: Lower sleep duration is linked to higher stress.**  
+- Test: ANOVA or Kruskal–Wallis (depending on assumptions)  
+- Visual: box/violin plot of Sleep_Duration by Stress_Detection
 
-```console
-! python --version
-```
+**H2: Lower sleep quality is linked to higher stress.**  
+- Test: ANOVA or Kruskal–Wallis  
+- Visual: box/violin plot of Sleep_Quality by Stress_Detection
 
-## Deployment Reminders
+**H3: Higher screen time is linked to higher stress.**  
+- Test: Spearman correlation + group comparison  
+- Visual: scatter (Screen_Time vs Sleep_Duration, colour = stress) OR line-style chart of % High stress by Screen_Time bins
 
-* Set the `.python-version` Python version to a [Heroku-22](https://devcenter.heroku.com/articles/python-support#supported-runtimes) stack currently supported version that closest matches what you used in this project.
-* The project can be deployed to Heroku using the following steps.
+**H4: Meditation practice is linked to lower stress.**  
+- Test: Chi-square test of independence  
+- Visual: stacked/grouped bar of stress distribution by Meditation_Practice
 
-1. Log in to Heroku and create an App
-2. At the **Deploy** tab, select **GitHub** as the deployment method.
-3. Select your repository name and click **Search**. Once it is found, click **Connect**.
-4. Select the branch you want to deploy, then click **Deploy Branch**.
-5. The deployment process should happen smoothly if all deployment files are fully functional. Click the button **Open App** at the top of the page to access your App.
-6. If the slug size is too large, then add large files not required for the app to the `.slugignore` file.
+**H5: Higher physical activity is linked to lower stress.**  
+- Test: Kruskal–Wallis and/or Spearman correlation  
+- Visual: box/violin of Physical_Activity by stress + optional binned trend chart
+
+**H6: Higher caffeine intake is linked to higher stress.**  
+- Test: Spearman correlation + group comparison  
+- Visual: boxplot (Caffeine_Intake by stress) or binned % High stress chart
+
+**H7: Longer work hours and longer travel time are linked to higher stress.**  
+- Test: group comparison + correlation checks  
+- Visual: boxplots (Work_Hours / Travel_Time by stress)
+
+**H8: Health indicators differ across stress groups (BP, cholesterol, blood sugar).**  
+- Test: ANOVA/Kruskal–Wallis across stress groups  
+- Visual: boxplots for each health indicator by stress
+
+---
+
+## Stats & Probability (LO1 evidence)
+
+Alongside hypothesis tests, the project includes core statistics in the notebooks:
+- mean, median, variance, standard deviation
+- distribution checks (normality + outliers)
+- hypothesis testing logic (p-values + effect size interpretation)
+
+A simple probability example is also included, e.g.:
+- P(High Stress | Screen_Time ≥ X) vs P(High Stress | Screen_Time < X)
+
+---
+
+## Project approach (ETL → EDA → Stats → ML → Streamlit)
+
+### 1) ETL (Python)
+- Load raw CSV from `data/raw/`
+- Enforce data types (numeric vs categorical)
+- Parse `Bed_Time` and `Wake_Up_Time` → minutes since midnight
+- Standardise Yes/No fields
+- Reduce noisy categories where needed (e.g., Occupation Top-N + “Other”)
+- Save clean dataset to `data/processed/` and export a data dictionary to `reports/`
+
+### 2) EDA + hypothesis testing
+- Summary stats + distribution plots
+- Correlation scan for numeric features
+- H1–H8 tests with short interpretation in plain English
+
+### 3) Machine learning prototype (multiclass classification)
+- Baseline: Multinomial Logistic Regression (easy to explain)
+- Comparison model: Random Forest or Gradient Boosting (non-linear patterns)
+- Metrics: Accuracy, Macro F1, confusion matrix
+- Interpretation: feature importance / coefficients + “which classes are hardest to predict”
+
+### 4) Streamlit dashboard (the actual deliverable)
+The app is split into four pages:
+
+**Page 1 — Overview**
+- KPI cards (total users, % high stress, avg sleep duration, avg screen time)
+- Bar chart of stress distribution
+- Filters: gender, meditation, exercise type, stress level
+
+**Page 2 — Lifestyle Drivers**
+- Correlation heatmap (numeric)
+- Box/violin: sleep duration and sleep quality by stress
+- Scatter: screen time vs sleep duration (colour = stress)
+
+**Page 3 — Hypothesis Lab**
+- Pick a hypothesis (H1–H8)
+- Show: test used, p-value, effect size (where possible), short meaning
+- Show 1 supporting chart for the selected hypothesis
+
+**Page 4 — Stress Predictor**
+- Input form (sleep, screen time, caffeine, etc.)
+- Output: predicted class + probability bars
+- Confusion matrix snapshot (so we’re honest about performance)
+
+---
+
+## Required chart types (minimum 4)
+Streamlit includes at least:
+- Bar chart
+- Box/violin plot
+- Scatter plot
+- Heatmap  
+(Plus optional histogram + probability bar chart)
+
+---
+
+## Tools used
+- pandas, numpy (ETL + analysis)
+- scipy.stats / statsmodels (hypothesis testing)
+- scikit-learn (modelling + evaluation)
+- matplotlib + plotly (visuals)
+- streamlit (dashboard UI)
+
+---
+
+## How to run locally
+1. Clone the repo  
+2. Install dependencies:
+   `pip install -r requirements.txt`
+3. Run the app:
+   `streamlit run app/streamlit_app.py`
+
+---
+
+## Deployment
+Deployed using Streamlit Community Cloud.  
+Live link: (add your link here)
+
+---
+
+## Limitations
+- The dataset is cross-sectional, so it supports association, not causation.
+- Bed/Wake times are self-reported averages (not tracked sleep sessions).
+- Some categories (e.g. Occupation) are messy/high-cardinality and may be grouped.
+
+---
+
+## Ethics
+- This project is not medical advice.
+- Results are presented as associations in this dataset, not universal truths.
+- Basic bias checks are included (e.g., model performance by gender/segments).
+
+---
+
+## Project structure
+(Keep updated as you build)
+
+data/
+  raw/
+  processed/
+app/
+  streamlit_app.py
+jupyter_notebooks/
+reports/
+README.md
+requirements.txt
+
+---
+
+## Credits
+- Dataset: Kaggle “Stress Level Prediction” by shijo96john
+- Code Institute: assessment guidance + learning materials
+- ChatGPT: planning support and debugging ideas (final edits and implementation done by the project author)
