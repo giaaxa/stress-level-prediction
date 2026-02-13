@@ -57,7 +57,7 @@ StressSense makes those patterns visible, tests a few sensible assumptions with 
 3. **Segment comparisons**
    - How does stress differ for meditation vs non-meditation, exercise types, gender, etc.?
 
-4. **Evidence (not just vibes)**
+4. **Evidence**
    - Show simple statistical tests + effect sizes where appropriate.
 
 5. **Predictive prototype**
