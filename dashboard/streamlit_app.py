@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+from pathlib import Path
 
 
 def load_data(path: str) -> pd.DataFrame:
@@ -93,7 +94,8 @@ def page_overview(df: pd.DataFrame) -> None:
 def main() -> None:
     st.set_page_config(page_title="StressSense", page_icon="🧠", layout="wide")
 
-    data_path = "data/processed/stress_data_processed.csv"
+    DATA_DIR = Path(__file__).parent.parent / "data" / "processed"
+    data_path = DATA_DIR / "stress_data_processed.csv"
     df = load_data(data_path)
 
     filtered = add_sidebar_filters(df)
