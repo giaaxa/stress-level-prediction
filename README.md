@@ -134,10 +134,10 @@ A simple probability example is also included, e.g.:
 - H1–H8 tests with short interpretation in plain English
 
 ### 3) Machine learning prototype (multiclass classification)
-- Baseline: Multinomial Logistic Regression (easy to explain)
-- Comparison model: Random Forest or Gradient Boosting (non-linear patterns)
-- Metrics: Accuracy, Macro F1, confusion matrix
-- Interpretation: feature importance / coefficients + “which classes are hardest to predict”
+- Model: XGBoost Classifier with SMOTE for class imbalance
+- Hyperparameter tuning via GridSearchCV
+- Metrics: Accuracy (~67%), confusion matrix
+- Model artifacts saved to `models/` directory for dashboard integration
 
 ### 4) Streamlit dashboard (the actual deliverable)
 The app is split into four pages:
@@ -160,7 +160,12 @@ The app is split into four pages:
 **Page 4 — Stress Predictor**
 - Input form (sleep, screen time, caffeine, etc.)
 - Output: predicted class + probability bars
-- Confusion matrix snapshot (so we’re honest about performance)
+- Confusion matrix snapshot (so we're honest about performance)
+
+> **Known Issue:** The Stress Predictor page may show an error due to XGBoost version mismatch between the training environment and the Streamlit runtime. If this occurs, retrain the model using your local environment's Python:
+> ```bash
+> python jupyter_notebooks/03_Modelling.ipynb  # or run the notebook cells manually
+> ```
 
 ---
 
@@ -184,11 +189,15 @@ Streamlit includes at least:
 ---
 
 ## How to run locally
-1. Clone the repo  
+1. Clone the repo
 2. Install dependencies:
-   `pip install -r requirements.txt`
+   ```bash
+   pip install -r requirements.txt
+   ```
 3. Run the app:
-   `streamlit run app/streamlit_app.py`
+   ```bash
+   streamlit run dashboard/streamlit_app.py
+   ```
 
 ---
 
@@ -213,17 +222,29 @@ Live link: (add your link here)
 ---
 
 ## Project structure
-(Keep updated as you build)
 
-data/
-  raw/
-  processed/
-app/
-  streamlit_app.py
-jupyter_notebooks/
-reports/
-README.md
-requirements.txt
+```
+stress-level-prediction/
+├── data/
+│   ├── raw/                          # Original dataset
+│   └── processed/                    # Cleaned & feature-engineered data
+├── dashboard/
+│   ├── streamlit_app.py              # Main app (Page 1 - Overview)
+│   └── pages/
+│       ├── 1_Lifestyle_Drivers.py    # Page 2 - Correlations & charts
+│       ├── 2_Hypothesis_Lab.py       # Page 3 - Statistical tests H1-H8
+│       └── 3_Stress_Predictor.py     # Page 4 - ML predictions
+├── jupyter_notebooks/
+│   ├── 01_ETL.ipynb                  # Data cleaning & feature engineering
+│   ├── 02_EDA.ipynb                  # Exploratory analysis & hypothesis tests
+│   └── 03_Modelling.ipynb            # XGBoost model training
+├── models/                           # Saved model artifacts (.pkl files)
+├── docs/plans/                       # Design & implementation plans
+├── README.md
+├── requirements.txt
+├── Procfile                          # Streamlit Cloud deployment
+└── setup.sh
+```
 
 ---
 
