@@ -251,4 +251,4 @@ stress-level-prediction/
 ## Credits
 - Dataset: Kaggle “Stress Level Prediction” by shijo96john
 - Code Institute: assessment guidance + learning materials
-- ChatGPT: planning support and debugging ideas (final edits and implementation done by the project author)
+- Claude + codex: planning support, guidance when stuck and debugging, helping with the streamlit dashboard (final edits and implementation done by the project author)
